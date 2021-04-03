@@ -3,6 +3,11 @@
 
 // gRPC Prometheus monitoring interceptors for server-side gRPC.
 
+// Forked originally form https://github.com/grpc-ecosystem/go-grpc-prometheus/
+// the very same thing with https://github.com/grpc-ecosystem/go-grpc-prometheus/pull/88 integrated
+// for the additional functionality to monitore bytes received and send from clients or servers
+// eveything that is in between a "---- PR-88 ---- {"  and   "---- PR-88 ---- }" comment is the new addition from the PR88.
+
 package grpc_prometheus
 
 import (
@@ -21,6 +26,9 @@ var (
 
 	// StreamServerInterceptor is a gRPC server-side interceptor that provides Prometheus monitoring for Streaming RPCs.
 	StreamServerInterceptor = DefaultServerMetrics.StreamServerInterceptor()
+
+	// ServerStatsHandler is a gRPC server-side stats.Handler that provides Prometheus monitoring
+	ServerStatsHandler = DefaultServerMetrics.NewServerStatsHandler() //new
 )
 
 func init() {
@@ -46,3 +54,25 @@ func EnableHandlingTimeHistogram(opts ...HistogramOption) {
 	DefaultServerMetrics.EnableHandlingTimeHistogram(opts...)
 	prom.Register(DefaultServerMetrics.serverHandledHistogram)
 }
+
+// ---- PR-88 ---- {
+
+// EnableServerMsgSizeReceivedBytesHistogram turns on recording of handling time
+// of RPCs. Histogram metrics can be very expensive for Prometheus
+// to retain and query. This function acts on the DefaultServerMetrics
+// variable and the default Prometheus metrics registry.
+func EnableServerMsgSizeReceivedBytesHistogram(opts ...HistogramOption) {
+	DefaultServerMetrics.EnableMsgSizeReceivedBytesHistogram(opts...)
+	prom.Register(DefaultServerMetrics.serverMsgSizeReceivedHistogram)
+}
+
+// EnableServerMsgSizeSentBytesHistogram turns on recording of handling time
+// of RPCs. Histogram metrics can be very expensive for Prometheus
+// to retain and query. This function acts on the DefaultServerMetrics
+// variable and the default Prometheus metrics registry.
+func EnableServerMsgSizeSentBytesHistogram(opts ...HistogramOption) {
+	DefaultServerMetrics.EnableMsgSizeSentBytesHistogram(opts...)
+	prom.Register(DefaultServerMetrics.serverMsgSizeSentHistogram)
+}
+
+// ---- PR-88 ---- }
