@@ -1,15 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	pb "github.com/grpc-ecosystem/go-grpc-prometheus/examples/grpc-server-with-prometheus/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -24,8 +24,7 @@ func newDemoServer() *DemoServiceServer {
 
 // SayHello implements a interface defined by protobuf.
 func (s *DemoServiceServer) SayHello(ctx context.Context, request *pb.HelloRequest) (*pb.HelloResponse, error) {
-	customizedCounterMetric.WithLabelValues(request.Name).Inc()
-	return &pb.HelloResponse{Message: fmt.Sprintf("Hello %s", request.Name)}, nil
+	return &pb.HelloResponse{Message: "ABCDEFGH"}, nil
 }
 
 var (
@@ -34,18 +33,13 @@ var (
 
 	// Create some standard server metrics.
 	grpcMetrics = grpc_prometheus.NewServerMetrics()
-
-	// Create a customized counter metric.
-	customizedCounterMetric = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Name: "demo_server_say_hello_method_handle_count",
-		Help: "Total number of RPCs handled on the server.",
-	}, []string{"name"})
 )
 
 func init() {
 	// Register standard server metrics and customized metrics to registry.
-	reg.MustRegister(grpcMetrics, customizedCounterMetric)
-	customizedCounterMetric.WithLabelValues("Test")
+	grpcMetrics.EnableMsgSizeReceivedBytesHistogram()
+	grpcMetrics.EnableMsgSizeSentBytesHistogram()
+	reg.MustRegister(grpcMetrics)
 }
 
 // NOTE: Graceful shutdown is missing. Don't use this demo in your production setup.
@@ -57,13 +51,9 @@ func main() {
 	}
 	defer lis.Close()
 
-	// Create a HTTP server for prometheus.
-	httpServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 9092)}
-
 	// Create a gRPC Server with gRPC interceptor.
 	grpcServer := grpc.NewServer(
-		grpc.StreamInterceptor(grpcMetrics.StreamServerInterceptor()),
-		grpc.UnaryInterceptor(grpcMetrics.UnaryServerInterceptor()),
+		grpc.StatsHandler(grpcMetrics.NewServerStatsHandler()),
 	)
 
 	// Create a new api server.
@@ -77,7 +67,8 @@ func main() {
 
 	// Start your http server for prometheus.
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
+		http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+		if err := http.ListenAndServe(":9092", nil); err != nil {
 			log.Fatal("Unable to start a http server.")
 		}
 	}()

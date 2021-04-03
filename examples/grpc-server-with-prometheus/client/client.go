@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,10 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	"github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	pb "github.com/grpc-ecosystem/go-grpc-prometheus/examples/grpc-server-with-prometheus/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -23,13 +23,14 @@ func main() {
 	reg := prometheus.NewRegistry()
 	// Create some standard client metrics.
 	grpcMetrics := grpc_prometheus.NewClientMetrics()
+	grpcMetrics.EnableMsgSizeSentBytesHistogram()
+	grpcMetrics.EnableMsgSizeReceivedBytesHistogram()
 	// Register client metrics to registry.
 	reg.MustRegister(grpcMetrics)
 	// Create a insecure gRPC channel to communicate with the server.
 	conn, err := grpc.Dial(
 		fmt.Sprintf("localhost:%v", 9093),
-		grpc.WithUnaryInterceptor(grpcMetrics.UnaryClientInterceptor()),
-		grpc.WithStreamInterceptor(grpcMetrics.StreamClientInterceptor()),
+		grpc.WithStatsHandler(grpcMetrics.NewClientStatsHandler()),
 		grpc.WithInsecure(),
 	)
 	if err != nil {
@@ -54,7 +55,7 @@ func main() {
 	go func() {
 		for {
 			// Call “SayHello” method and wait for response from gRPC Server.
-			_, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: "Test"})
+			_, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: "ABCDEFGH"})
 			if err != nil {
 				log.Printf("Calling the SayHello method unsuccessfully. ErrorInfo: %+v", err)
 				log.Printf("You should to stop the process")
