@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	pb_testproto "github.com/JST1703/go-grpc-prometheus/v2/examples/testproto"
+	pb_testproto "github.com/JST1703/go-grpc-prometheus/examples/testproto"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc"
