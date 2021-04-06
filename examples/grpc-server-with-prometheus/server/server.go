@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	grpc_prometheus "github.com/JST1703/go-grpc-prometheus/"
+	grpc_prometheus "github.com/JST1703/go-grpc-prometheus"
 	pb "github.com/JST1703/go-grpc-prometheus/examples/grpc-server-with-prometheus/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

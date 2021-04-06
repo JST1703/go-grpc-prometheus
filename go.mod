@@ -10,3 +10,5 @@ require (
 )
 
 go 1.13 // PR-88
+
+replace github.com/grpc-ecosystemgo-grpc-prometheus => github.com/JST1703/go-grpc-prometheus v1.2.1
