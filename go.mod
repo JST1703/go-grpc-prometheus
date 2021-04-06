@@ -2,7 +2,6 @@ module github.com/JST1703/go-grpc-prometheus/v2
 
 require (
 	github.com/golang/protobuf v1.2.0
-	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/prometheus/client_golang v0.9.2
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90
 	github.com/stretchr/testify v1.3.0
