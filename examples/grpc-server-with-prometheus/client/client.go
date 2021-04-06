@@ -12,7 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/JST1703/go-grpc-prometheus/v2"
 	pb "github.com/grpc-ecosystem/go-grpc-prometheus/examples/grpc-server-with-prometheus/protobuf"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
