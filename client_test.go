@@ -8,6 +8,8 @@
 
 package grpc_prometheus
 
+/*
+
 import (
 	"context"
 	"io"
@@ -189,3 +191,5 @@ func (s *ClientInterceptorTestSuite) SetupSuiteWithStatsHanlder() {
 }
 
 // ---- PR-88 ---- }
+
+*/

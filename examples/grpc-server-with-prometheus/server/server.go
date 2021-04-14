@@ -24,39 +24,26 @@ func newDemoServer() *DemoServiceServer {
 
 // SayHello implements a interface defined by protobuf.
 func (s *DemoServiceServer) SayHello(ctx context.Context, request *pb.HelloRequest) (*pb.HelloResponse, error) {
-	return &pb.HelloResponse{Message: "ABCDEFGH"}, nil
-}
-
-var (
-	// Create a metrics registry.
-	reg = prometheus.NewRegistry()
-
-	// Create some standard server metrics.
-	grpcMetrics = grpc_prometheus.NewServerMetrics()
-)
-
-func init() {
-	// Register standard server metrics and customized metrics to registry.
-	grpcMetrics.EnableMsgSizeReceivedBytesHistogram()
-	grpcMetrics.EnableMsgSizeSentBytesHistogram()
-	reg.MustRegister(grpcMetrics)
+	return &pb.HelloResponse{Message: "chimichanga"}, nil
 }
 
 // NOTE: Graceful shutdown is missing. Don't use this demo in your production setup.
 func main() {
 	// Listen an actual port.
+
+	bytemetrics := grpc_prometheus.NewServerByteMetrics()
+	reg := prometheus.NewRegistry()
+	reg.MustRegister(bytemetrics)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9093))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	defer lis.Close()
 
-	// Create a HTTP server for prometheus.
-	httpServer := &http.Server{Handler: promhttp.HandlerFor(reg, promhttp.HandlerOpts{}), Addr: fmt.Sprintf("0.0.0.0:%d", 9092)}
-
 	// Create a gRPC Server with gRPC interceptor.
 	grpcServer := grpc.NewServer(
-		grpc.StatsHandler(grpcMetrics.NewServerStatsHandler()),
+		grpc.StatsHandler(bytemetrics.NewServerByteStatsHandler()),
 	)
 
 	// Create a new api server.
@@ -65,12 +52,10 @@ func main() {
 	// Register your service.
 	pb.RegisterDemoServiceServer(grpcServer, demoServer)
 
-	// Initialize all metrics.
-	grpcMetrics.InitializeMetrics(grpcServer)
-
 	// Start your http server for prometheus.
 	go func() {
-		if err := httpServer.ListenAndServe(); err != nil {
+		http.Handle("/bytesize", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+		if err := http.ListenAndServe(":9092", nil); err != nil {
 			log.Fatal("Unable to start a http server.")
 		}
 	}()

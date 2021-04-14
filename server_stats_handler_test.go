@@ -8,6 +8,8 @@
 
 package grpc_prometheus
 
+/*
+
 import (
 	"context"
 	"io"
@@ -164,3 +166,4 @@ func (s *ServerStatsHandlerTestSuite) TestStreamingIncrementsMetrics() {
 	requireValueHistCount(s.T(), 2, DefaultServerMetrics.serverMsgSizeSentHistogram.WithLabelValues("mwitkow.testproto.TestService", "PingList", Tailer.String()))
 
 }
+*/

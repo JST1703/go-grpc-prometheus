@@ -10,6 +10,8 @@
 
 package grpc_prometheus
 
+/*
+
 import (
 	prom "github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
@@ -76,3 +78,5 @@ func EnableServerMsgSizeSentBytesHistogram(opts ...HistogramOption) {
 }
 
 // ---- PR-88 ---- }
+
+*/

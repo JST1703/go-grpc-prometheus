@@ -8,6 +8,8 @@
 
 package grpc_prometheus
 
+/*
+
 import (
 	"context"
 	"io"
@@ -167,3 +169,5 @@ func (s *ClientStatsHandlerTestSuite) TestStreamingIncrementsMetrics() {
 	requireValueWithRetryHistCount(s.ctx, s.T(), 2, DefaultClientMetrics.clientMsgSizeSentHistogram.WithLabelValues("mwitkow.testproto.TestService", "PingList", Payload.String()))
 	requireValueWithRetryHistCount(s.ctx, s.T(), 2, DefaultClientMetrics.clientMsgSizeReceivedHistogram.WithLabelValues("mwitkow.testproto.TestService", "PingList", Tailer.String()))
 }
+
+*/

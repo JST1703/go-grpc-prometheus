@@ -3,6 +3,8 @@
 
 package grpc_prometheus
 
+/*
+
 import (
 	"bufio"
 	"context"
@@ -352,3 +354,5 @@ func requireValueWithRetryHistCount(ctx context.Context, t *testing.T, expect in
 		}
 	}
 }
+
+*/
